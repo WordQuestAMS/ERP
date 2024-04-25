@@ -1,0 +1,37 @@
+OBJECT Table 50033 Users
+{
+  OBJECT-PROPERTIES
+  {
+    Date=25/04/24;
+    Time=18:00:39;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 1   ;   ;uuid                ;Integer        }
+    { 2   ;   ;nickname            ;Text30         }
+    { 3   ;   ;email               ;Text30         }
+    { 4   ;   ;phone_number        ;Text30         }
+    { 5   ;   ;avatar              ;Text30         }
+    { 6   ;   ;creation_date       ;DateTime       }
+    { 7   ;   ;api_key             ;Text30         }
+  }
+  KEYS
+  {
+    {    ;uuid                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

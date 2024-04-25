@@ -1,0 +1,34 @@
+OBJECT Table 50034 Diccionarios
+{
+  OBJECT-PROPERTIES
+  {
+    Date=25/04/24;
+    Time=18:01:45;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 1   ;   ;_id                 ;Integer        }
+    { 2   ;   ;palabra             ;Text30         }
+    { 3   ;   ;idioma              ;Text30         }
+    { 4   ;   ;uso                 ;Integer        }
+  }
+  KEYS
+  {
+    {    ;_id                                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
