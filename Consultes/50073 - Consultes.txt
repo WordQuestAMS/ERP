@@ -1,0 +1,125 @@
+OBJECT Codeunit 50073 Consultes
+{
+  OBJECT-PROPERTIES
+  {
+    Date=02/05/24;
+    Time=17:40:51;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            CR := 13; // Carriage Return - (Hex $0D)
+            LF := 10; // Line Feed - (Hex $0A)
+
+            Menu := Window.InputBox('1. Consulta de les dades d''un usuari' + FORMAT(CR) + FORMAT(LF) +
+                                              '2. Consulta de l''£ltima partida d''un usuari' + FORMAT(CR) + FORMAT(LF) +
+                                              '3. Consulta del percentatge de partides guanyades d''un usuari' + FORMAT(CR) + FORMAT(LF) +
+                                              'Introdueix una opci¢:', 'Rosc•drom - Consulta usuaris', 'Opci¢', 150, 150);
+            CASE Menu OF
+              '1':
+                BEGIN
+                  userData();
+                END;
+              '2':
+                BEGIN
+                  userLastGame();
+                END;
+              '3':
+                BEGIN
+                  userWinRatio();
+                END;
+            END;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Window@1106000003 : DotNet "'Microsoft.VisualBasic, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'.Microsoft.VisualBasic.Interaction" RUNONCLIENT;
+      Menu@1106000002 : Text;
+      CR@1106000001 : Char;
+      LF@1106000000 : Char;
+      users@1106000004 : Record 50033;
+      partides@1106000005 : Record 50035;
+
+    LOCAL PROCEDURE userData@1106000005();
+    VAR
+      NicknameToSearch@1106000000 : Text;
+    BEGIN
+      EVALUATE(NicknameToSearch, Window.InputBox('Introdueix el nickname del usuari a cercar:', 'Cercar user per nickname', 'Nickname', 150, 150));
+
+      users.SETFILTER(nickname, NicknameToSearch);
+      IF users.FINDFIRST THEN BEGIN
+        MESSAGE('User Data:' + FORMAT(CR) + FORMAT(LF) + FORMAT(CR) + FORMAT(LF) +
+                      'Nickname: ' + users.nickname + FORMAT(CR) + FORMAT(LF) +
+                      'Email: ' + users.email + FORMAT(CR) + FORMAT(LF) +
+                      'Phone Number: ' + users.phone_number + FORMAT(CR) + FORMAT(LF) +
+                      'Avatar: ' + users.avatar + FORMAT(CR) + FORMAT(LF) +
+                      'Creation Date: ' + FORMAT(users.creation_date) + FORMAT(CR) + FORMAT(LF) +
+                      'API Key: ' + users.api_key + FORMAT(CR) + FORMAT(LF) +
+                      'Total Score: ' +FORMAT(users.total_score));
+      END;
+    END;
+
+    LOCAL PROCEDURE userLastGame@1106000016();
+    VAR
+      NicknameToSearch@1106000000 : Text;
+      userId@1106000001 : Text;
+    BEGIN
+      EVALUATE(NicknameToSearch, Window.InputBox('Introdueix el nickname del usuari a cercar:', 'Cercar user per nickname', 'Nickname', 150, 150));
+
+      users.SETFILTER(nickname, NicknameToSearch);
+      IF users.FINDFIRST THEN BEGIN
+        userId := users.uuid;
+      END;
+      partides.SETFILTER(user, userId);
+      IF partides.FINDLAST THEN BEGIN
+        MESSAGE(users.nickname + ' ultima partida:' + FORMAT(CR) + FORMAT(LF) + FORMAT(CR) + FORMAT(LF) +
+                      'Nickname: ' + users.nickname + FORMAT(CR) + FORMAT(LF) +
+                      'Score: ' + FORMAT(partides.score) + FORMAT(CR) + FORMAT(LF) +
+                      'Game date: ' + FORMAT(partides.gameDate) + FORMAT(CR) + FORMAT(LF) +
+                      'Game won: ' + FORMAT(partides.won));
+      END;
+    END;
+
+    LOCAL PROCEDURE userWinRatio@1106000018();
+    VAR
+      NicknameToSearch@1106000004 : Text;
+      userId@1106000003 : Text;
+      gamesWon@1106000002 : Integer;
+      gamesLost@1106000001 : Integer;
+      totalGames@1106000000 : Integer;
+    BEGIN
+      EVALUATE(NicknameToSearch, Window.InputBox('Introdueix el nickname del usuari a cercar:', 'Cercar user per nickname', 'Nickname', 150, 150));
+
+      users.SETFILTER(nickname, NicknameToSearch);
+      IF users.FINDFIRST THEN BEGIN
+        userId := users.uuid;
+      END;
+      partides.SETFILTER(user, userId);
+
+      IF partides.FIND('-') THEN BEGIN
+        REPEAT
+          IF partides.won THEN BEGIN
+            gamesWon := gamesWon + 1;
+            totalGames := totalGames + 1;
+          END;
+          IF NOT partides.won THEN BEGIN
+            gamesLost := gamesLost + 1;
+            totalGames := totalGames + 1;
+          END;
+        UNTIL partides.NEXT = 0;
+      END;
+
+      MESSAGE(users.nickname + ' ratio de victories:' + FORMAT(CR) + FORMAT(LF) + FORMAT(CR) + FORMAT(LF) +
+                      'Nickname: ' + users.nickname + FORMAT(CR) + FORMAT(LF) +
+                      'Win Ratio: ' + FORMAT(gamesWon / totalGames * 100) + '%');
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
